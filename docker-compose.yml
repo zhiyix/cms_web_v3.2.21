@@ -1,0 +1,60 @@
+version: '2'
+services:     
+  mysql-3221:
+    image: mysql:5.7
+    container_name: mysql-3221
+    restart: always
+    ports: 
+     - 13221:3306
+    volumes:
+     - /etc/localtime:/etc/localtime:ro
+     - /mnt/data/mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 
+     
+  redis-3221:
+    image: iot.imetre.cn:8511/my-redis
+    container_name: redis-3221
+    restart: always
+    ports: 
+     - 23221:6379
+    volumes:
+     - /etc/localtime:/etc/localtime:ro
+     - ~/docker/v3.2.21/redis/data:/data
+
+  tomcat-3221:
+    image: iot.imetre.cn:8511/cms_app_web_server:v3.2.21
+    container_name: tomcat-3221
+    restart: always
+    environment:
+      - MYSQL_HOST=172.16.19.246
+      - REDIS_HOST=172.16.19.246
+      - MQTT_HOST=114.215.30.117
+      - MYSQL_PORT=13221
+      - REDIS_PORT=23221
+      - MQTT_PORT=1884
+      - MYSQL_PASSWORD=
+      - REDIS_PASSWORD=
+    ports: 
+     - 8080:8080
+    volumes:
+     - /etc/localtime:/etc/localtime:ro
+     - ~/docker/v3.2.21/tomcat/data:/usr/local/tomcat/data
+     - ~/docker/v3.2.21/tomcat/logs:/usr/local/tomcat/logs
+     - ~/docker/v3.2.21/tomcat/etc:/usr/local/tomcat/webapps/cms-web-client/WEB-INF/classes/props
+     - ~/docker/v3.2.21/tomcat/etc:/usr/local/tomcat/webapps/as_web_client/WEB-INF/classes/props
+    links:
+     - mysql-3221
+     - redis-3221
+    
+  web-3221:
+    image: iot.imetre.cn:8511/cms_web_client:v3.2.21
+    container_name: web-3221
+    restart: always
+    ports: 
+     - 3000:3000
+    volumes:
+     - /etc/localtime:/etc/localtime:ro
+     - ~/docker/v3.2.21/node/assets:/usr/local/web/apps/dist/assets
+    links:
+     - tomcat-3221

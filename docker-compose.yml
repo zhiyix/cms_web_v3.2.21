@@ -23,7 +23,7 @@ services:
      - ~/docker/v3.2.21/redis/data:/data
 
   tomcat-3221:
-    image: iot.imetre.cn:8511/cms_app_web_server:v3.2.21
+    image: iot.imetre.cn/cms/cms-app-web-server:v3.2.21
     container_name: tomcat-3221
     restart: always
     environment:
